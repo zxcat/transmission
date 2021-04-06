@@ -43,6 +43,14 @@
         downloadFolder: (NSString *) downloadFolder
         legacyIncompleteFolder: (NSString *) incompleteFolder;
 
+- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
+        magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
+        groupValue: (NSNumber *) groupValue
+        removeWhenFinishSeeding: (NSNumber *) removeWhenFinishSeeding
+        downloadFolder: (NSString *) downloadFolder
+        legacyIncompleteFolder: (NSString *) incompleteFolder
+        sequential: (BOOL)sequential; //!kk
+
 - (void) createFileList;
 - (void) insertPathForComponents: (NSArray *) components withComponentIndex: (NSUInteger) componentIndex forParent: (FileListNode *) parent fileSize: (uint64_t) size
     index: (NSInteger) index flatList: (NSMutableArray *) flatFileList;
@@ -134,6 +142,16 @@ bool trashDataFile(const char * filename, tr_error ** error)
 #warning remove ivars in header when 64-bit only (or it compiles in 32-bit mode)
 @synthesize removeWhenFinishSeeding = fRemoveWhenFinishSeeding;
 
+- (BOOL)isSequential {
+    return bSequential;
+}
+- (void)setSequential:(BOOL)sequential {
+    if (bSequential != sequential) {
+        bSequential = sequential;
+        tr_setSequential(fHandle, sequential);
+    }
+}
+
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib
 {
@@ -183,8 +201,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
                 removeWhenFinishSeeding: history[@"RemoveWhenFinishSeeding"]
                 downloadFolder: history[@"DownloadFolder"] //upgrading from versions < 1.80
                 legacyIncompleteFolder: [history[@"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
-                                        ? history[@"IncompleteFolder"] : nil];
-
+                                        ? history[@"IncompleteFolder"] : nil
+                sequential:[history[@"SequentialDownload"] boolValue]];
+    
     if (self)
     {
         //start transfer
@@ -230,7 +249,9 @@ bool trashDataFile(const char * filename, tr_error ** error)
             @"Active": @([self isActive]),
             @"WaitToStart": @([self waitingToStart]),
             @"GroupValue": @(fGroupValue),
-            @"RemoveWhenFinishSeeding": @(fRemoveWhenFinishSeeding)};
+            @"RemoveWhenFinishSeeding": @(fRemoveWhenFinishSeeding),
+            @"SequentialDownload": @(bSequential)
+    };
 }
 
 - (void) dealloc
@@ -1641,12 +1662,24 @@ bool trashDataFile(const char * filename, tr_error ** error)
 
 @implementation Torrent (Private)
 
+
 - (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
         magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
         groupValue: (NSNumber *) groupValue
         removeWhenFinishSeeding: (NSNumber *) removeWhenFinishSeeding
         downloadFolder: (NSString *) downloadFolder
         legacyIncompleteFolder: (NSString *) incompleteFolder
+{
+    return [self initWithPath:path hash:hashString torrentStruct:torrentStruct magnetAddress:magnetAddress lib:lib groupValue:groupValue removeWhenFinishSeeding:removeWhenFinishSeeding downloadFolder:downloadFolder legacyIncompleteFolder:incompleteFolder sequential:NO];
+}
+
+- (id) initWithPath: (NSString *) path hash: (NSString *) hashString torrentStruct: (tr_torrent *) torrentStruct
+       magnetAddress: (NSString *) magnetAddress lib: (tr_session *) lib
+       groupValue: (NSNumber *) groupValue
+       removeWhenFinishSeeding: (NSNumber *) removeWhenFinishSeeding
+       downloadFolder: (NSString *) downloadFolder
+       legacyIncompleteFolder: (NSString *) incompleteFolder
+       sequential:(BOOL)sequential
 {
     if (!(self = [super init]))
         return nil;
@@ -1657,7 +1690,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         fHandle = torrentStruct;
     else
     {
-        //set libtransmission settings for initialization
+       //set libtransmission settings for initialization
         tr_ctor * ctor = tr_ctorNew(lib);
 
         tr_ctorSetPaused(ctor, TR_FORCE, YES);
@@ -1686,6 +1719,7 @@ bool trashDataFile(const char * filename, tr_error ** error)
         {
             return nil;
         }
+        tr_setSequential(fHandle, sequential); //!!!kk
     }
 
     fInfo = tr_torrentInfo(fHandle);
@@ -1716,6 +1750,8 @@ bool trashDataFile(const char * filename, tr_error ** error)
         fGroupValueDetermination = TorrentDeterminationAutomatic;
         fGroupValue = [[GroupsController groups] groupIndexForTorrent: self];
     }
+
+    bSequential = sequential; //!!!kk
 
     fRemoveWhenFinishSeeding = removeWhenFinishSeeding ? [removeWhenFinishSeeding boolValue] : [fDefaults boolForKey: @"RemoveWhenFinishSeeding"];
 

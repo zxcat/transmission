@@ -948,6 +948,11 @@ static int comparePieceByWeight(void const* va, void const* vb)
         return 1;
     }
 
+    //!!!kk
+    if (tor->bSequential) {
+        return a->index > b->index ? 1 : -1;
+    }
+
     /* tertiary key: rarest first. */
     ia = rep[a->index];
     ib = rep[b->index];

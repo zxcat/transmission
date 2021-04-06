@@ -759,6 +759,12 @@ CA
                 <menuItem isSeparatorItem="YES" id="3172">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
+                <menuItem title="Скачивать последовательно" id="FxP-yJ-be2">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="setSequentialState:" target="206" id="pfJ-mE-DBt"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Показать данные в Finder" id="516">
                     <connections>
                         <action selector="revealFile:" target="206" id="1467"/>

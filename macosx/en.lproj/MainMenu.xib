@@ -759,6 +759,12 @@ CA
                 <menuItem isSeparatorItem="YES" id="3172">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
+                <menuItem title="Sequential Download" id="YAB-pu-wNA">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="setSequentialState:" target="206" id="SzW-9e-uvt"/>
+                    </connections>
+                </menuItem>
                 <menuItem title="Show in Finder" id="516">
                     <connections>
                         <action selector="revealFile:" target="206" id="1467"/>

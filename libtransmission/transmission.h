@@ -987,6 +987,8 @@ void tr_torrentStart(tr_torrent* torrent);
 /** @brief Stop (pause) a torrent */
 void tr_torrentStop(tr_torrent* torrent);
 
+void tr_setSequential(tr_torrent* tor, bool bSeq); //!!!kk
+
 typedef void (* tr_torrent_rename_done_func)(tr_torrent* torrent, char const* oldpath, char const* newname, int error,
     void* user_data);
 

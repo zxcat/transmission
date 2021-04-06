@@ -147,6 +147,8 @@ typedef enum
 - (void) stopAllTorrents:           (id) sender;
 - (void) stopTorrents:              (NSArray *) torrents;
 
+- (IBAction)setSequentialState:(id)sender; //!!!kk
+
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData;
 - (void) removeSheetDidEnd: (NSWindow *) sheet returnCode: (NSInteger) returnCode
                         contextInfo: (void *) contextInfo;

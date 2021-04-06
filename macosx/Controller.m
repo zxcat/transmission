@@ -1397,6 +1397,20 @@ static void removeKeRangerRansomware()
     [self fullUpdateUI];
 }
 
+- (IBAction)setSequentialState:(id)sender {
+    Torrent* t = (Torrent*)([fTableView selectedTorrents][0]);
+    NSInteger state = ((NSMenuItem*)sender).state;
+    BOOL p = NO;
+    if (state) {
+        state = 0;
+    } else {
+        state = 1;
+        p = YES;
+    }
+    ((NSMenuItem*)sender).state = state;
+    [t setSequential:p];
+}
+
 - (void) removeTorrents: (NSArray *) torrents deleteData: (BOOL) deleteData
 {
     if ([fDefaults boolForKey: @"CheckRemove"])
@@ -3976,6 +3990,17 @@ static void removeKeRangerRansomware()
 - (BOOL) validateMenuItem: (NSMenuItem *) menuItem
 {
     SEL action = [menuItem action];
+
+    if (action == @selector(setSequentialState:)) {
+        BOOL checked =  NO;
+        for (Torrent * torrent in [fTableView selectedTorrents])
+            if ([torrent isSequential]) {
+                checked = YES;
+                break;
+            }
+        [menuItem setState: checked ? NSOnState : NSOffState];
+        return YES;
+    }
 
     if (action == @selector(toggleSpeedLimit:))
     {

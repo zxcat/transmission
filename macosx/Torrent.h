@@ -54,6 +54,8 @@ typedef enum {
 
     BOOL fRemoveWhenFinishSeeding;
 
+    BOOL bSequential;
+
     NSInteger fGroupValue;
     TorrentDeterminationType fGroupValueDetermination;
 
@@ -63,6 +65,9 @@ typedef enum {
 
     BOOL fTimeMachineExcludeInitialized;
 }
+
+- (BOOL)isSequential;
+- (void)setSequential:(BOOL)sequential;
 
 - (id) initWithPath: (NSString *) path location: (NSString *) location deleteTorrentFile: (BOOL) torrentDelete
         lib: (tr_session *) lib;

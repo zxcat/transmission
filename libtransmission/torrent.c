@@ -1888,6 +1888,18 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     tr_sessionUnlock(tor->session);
 }
 
+void tr_setSequential(tr_torrent* tor, bool bSeq) {
+    if (tr_isTorrent(tor) && tor->bSequential != bSeq) {
+        tor->bSequential = bSeq;   //!!!kk
+        if (!tr_torrentIsSeed(tor)) {
+            tr_torrentLock(tor);
+            tr_torrentSetDirty(tor);
+            tr_peerMgrRebuildRequests(tor);
+            tr_torrentUnlock(tor);
+        }
+    }
+}
+
 void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))

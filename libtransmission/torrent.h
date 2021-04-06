@@ -259,7 +259,11 @@ struct tr_torrent
     bool finishedSeedingByIdle;
 
     tr_ptrArray labels;
+    
+    bool bSequential; //!kk
 };
+void tr_setSequential(tr_torrent* tor, bool bPro); //!!!kk
+
 
 static inline tr_torrent* tr_torrentNext(tr_session* session, tr_torrent* current)
 {
